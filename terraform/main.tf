@@ -7,11 +7,10 @@ terraform {
     bucket         = "nomad-tfstate"
     key            = "terraform/state.tfstate"
     region         = "ap-south-1"
-    dynamodb_table = "nomad-tf-lock"
+    table          = "nomad-tf-lock"
     encrypt        = true
   }
 }
-
 
 data "aws_s3_bucket" "terraform_state" {
   bucket = "nomad-tfstate"
