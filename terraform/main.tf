@@ -4,11 +4,11 @@ provider "aws" {
 
 terraform {
   backend "s3" {
-    bucket         = "nomad-tfstate"
-    key            = "terraform/state.tfstate"
-    region         = "ap-south-1"
-    table          = "nomad-tf-lock"
-    encrypt        = true
+    bucket  = "nomad-tfstate"
+    key     = "terraform/state.tfstate"
+    region  = "ap-south-1"
+    table   = "nomad-tf-lock"
+    encrypt = true
   }
 }
 
