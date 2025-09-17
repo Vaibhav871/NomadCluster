@@ -56,10 +56,10 @@ resource "aws_security_group" "nomad_sg" {
 
   # UI access from Bastion only (optionally, restrict further using a security group rule)
   ingress {
-    description = "Nomad UI (4646) from Bastion host"
-    from_port   = 4646
-    to_port     = 4646
-    protocol    = "tcp"
+    description     = "Nomad UI (4646) from Bastion host"
+    from_port       = 4646
+    to_port         = 4646
+    protocol        = "tcp"
     security_groups = [aws_security_group.bastion_sg.id] # Allow from Bastion SG only
   }
 
@@ -70,31 +70,31 @@ resource "aws_security_group" "nomad_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"] # Opens to the world. Restrict as necessary.
   }
-  
+
   # Nomad server RPC (4647, internal only)
   ingress {
-    description      = "RPC (4647) within cluster"
-    from_port        = 4647
-    to_port          = 4647
-    protocol         = "tcp"
-    self             = true
+    description = "RPC (4647) within cluster"
+    from_port   = 4647
+    to_port     = 4647
+    protocol    = "tcp"
+    self        = true
   }
 
   # Serf LAN (4648, internal gossip)
   ingress {
-    description      = "Serf LAN (4648) within cluster"
-    from_port        = 4648
-    to_port          = 4648
-    protocol         = "tcp"
-    self             = true
+    description = "Serf LAN (4648) within cluster"
+    from_port   = 4648
+    to_port     = 4648
+    protocol    = "tcp"
+    self        = true
   }
 
   # Allow SSH from Bastion security group only
   ingress {
-    description = "Allow SSH from Bastion"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
+    description     = "Allow SSH from Bastion"
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
     security_groups = [aws_security_group.bastion_sg.id]
   }
 
