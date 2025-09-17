@@ -9,8 +9,6 @@ sudo useradd --no-create-home --shell /bin/false prometheus || true
 sudo mkdir -p /etc/prometheus /var/lib/prometheus
 
 
-# Download and install Prometheus
-
 cd /tmp
 PROM_VERSION="3.5.0"
 wget https://github.com/prometheus/prometheus/releases/download/v${PROM_VERSION}/prometheus-${PROM_VERSION}.linux-amd64.tar.gz
