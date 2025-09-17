@@ -55,3 +55,5 @@ variable "admin_cidr" {
   description = "Your IP range to allow SSH to bastion (format: x.x.x.x/32)"
   default     = "0.0.0.0/0" # replace with your real IP for security
 }
+
+variable "bastion_public_key" {}
