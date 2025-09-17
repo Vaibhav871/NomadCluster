@@ -40,6 +40,7 @@ jobs:
         working-directory: terraform
 
       - name: Terraform Plan
+        working-directory: terraform
         env:
           TF_VAR_region:               ${{ secrets.REGION }}
           TF_VAR_availability_zone:    ${{ secrets.AVAILABILITY_ZONE }}
@@ -53,9 +54,11 @@ jobs:
           TF_VAR_dynamodb_table_name:      ${{ secrets.DYNAMODB_TABLE_NAME }}
           TF_VAR_nomad_client_count:        ${{ secrets.NOMAD_CLIENT_COUNT }}
           TF_VAR_bastion_public_key:         ${{ secrets.BASTION_PUBLIC_KEY }}
-        run: terraform plan -out=tfplan 
         
+        run: terraform plan -out=tfplan 
+
       - name: Terraform Apply
+        working-directory: terraform
         env:
           TF_VAR_region:               ${{ secrets.REGION }}
           TF_VAR_availability_zone:    ${{ secrets.AVAILABILITY_ZONE }}
