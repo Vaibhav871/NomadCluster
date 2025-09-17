@@ -54,7 +54,6 @@ jobs:
           TF_VAR_dynamodb_table_name:      ${{ secrets.DYNAMODB_TABLE_NAME }}
           TF_VAR_nomad_client_count:        ${{ secrets.NOMAD_CLIENT_COUNT }}
           TF_VAR_bastion_public_key:         ${{ secrets.BASTION_PUBLIC_KEY }}
-        
         run: terraform plan -out=tfplan 
 
       - name: Terraform Apply
