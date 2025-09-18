@@ -8,7 +8,7 @@ echo "Configuring Nomad Client..."
 # SERVER_AWS_TAG_VALUE="true"
 
 NOMAD_SERVER_IP="${NOMAD_SERVER_IP}"
-INSTANCE_IP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
+# INSTANCE_IP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
 
 
 
@@ -23,11 +23,7 @@ client {
   servers = ["${NOMAD_SERVER_IP}"]
 }
 
-advertise {
-  http = "${INSTANCE_IP}"
-  rpc  = "${INSTANCE_IP}"
-  serf = "${INSTANCE_IP}"
-}
+
 
 telemetry {
   collection_interval         = "15s"
