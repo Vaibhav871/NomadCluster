@@ -8,7 +8,6 @@ CLUSTER_SERVER_COUNT=1
 SERVER_AWS_TAG_KEY="nomad-server"
 SERVER_AWS_TAG_VALUE="true"
 
-# Create directories with locked-down permissions
 sudo mkdir -p /etc/nomad.d
 sudo chmod 700 /etc/nomad.d
 sudo mkdir -p /opt/nomad
@@ -38,7 +37,7 @@ server {
 }
 
 telemetry {
-  collection_interval         = "15s"
+  collection_interval         = "15s"S
   prometheus_metrics          = true
   publish_allocation_metrics  = true
   publish_node_metrics        = true
