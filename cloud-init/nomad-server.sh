@@ -1,54 +1,61 @@
 #!/bin/bash
 set -e
 
+echo "Configuring Nomad Server..."
 
-sudo apt-get update
-sudo apt-get install -y unzip curl ufw
+# Variables
+DATACENTER_NAME="dc1"              # Customize your datacenter name
+CLUSTER_SERVER_COUNT=3             # Should match your cluster size!
+SERVER_AWS_TAG_KEY="NomadServer"
+SERVER_AWS_TAG_VALUE="true"
 
-
-curl -sLo /tmp/nomad.zip "https://releases.hashicorp.com/nomad/1.10.5/nomad_1.10.5_linux_amd64.zip"
-sudo unzip /tmp/nomad.zip -d /usr/local/bin
-sudo chmod +x /usr/local/bin/nomad
-
-
+# Create directories with locked-down permissions
 sudo mkdir -p /etc/nomad.d
 sudo chmod 700 /etc/nomad.d
+sudo mkdir -p /opt/nomad
+sudo chmod 700 /opt/nomad
 
+# Optionally, create a dedicated system user for production
+# sudo useradd --system --home /opt/nomad --shell /bin/false nomad
+# sudo chown -R nomad:nomad /etc/nomad.d /opt/nomad
 
-sudo tee /etc/nomad.d/server.hcl > /dev/null <<EOT
-datacenter = "dc1"
-server {
-  enabled = true
-  bootstrap_expect = 1
-}
+# Get instance private IP for advertise block
+INSTANCE_IP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
+
+sudo tee /etc/nomad.d/server.hcl > /dev/null <<EOF
+datacenter = "${DATACENTER_NAME}"
 data_dir = "/opt/nomad"
 bind_addr = "0.0.0.0"
 
-telemetry {
-  prometheus_metrics         = true
-  publish_allocation_metrics = true
-  publish_node_metrics       = true
-  disable_hostname           = true
+advertise {
+  http = "${INSTANCE_IP}"
+  rpc  = "${INSTANCE_IP}"
+  serf = "${INSTANCE_IP}"
 }
-EOT
 
+server {
+  enabled = true
+  bootstrap_expect = ${CLUSTER_SERVER_COUNT}
+  server_join {
+    retry_join = ["provider=aws tag_key=${SERVER_AWS_TAG_KEY} tag_value=${SERVER_AWS_TAG_VALUE}"]
+    retry_interval = "15s"
+  }
+}
 
-sudo tee /etc/systemd/system/nomad.service > /dev/null <<EOT
-[Unit]
-Description=Nomad
-After=network-online.target
-Wants=network-online.target
+telemetry {
+  collection_interval         = "15s"
+  prometheus_metrics          = true
+  publish_allocation_metrics  = true
+  publish_node_metrics        = true
+  disable_hostname            = true
+}
+EOF
 
-[Service]
-ExecStart=/usr/local/bin/nomad agent -config=/etc/nomad.d
-Restart=on-failure
-LimitNOFILE=65536
+# Secure config file permissions
+sudo chmod 600 /etc/nomad.d/server.hcl
 
-[Install]
-WantedBy=multi-user.target
-EOT
+# Optionally, chown for system user
+# sudo chown nomad:nomad /etc/nomad.d/server.hcl
 
-
-sudo systemctl daemon-reload
+sudo systemctl restart nomad
 sudo systemctl enable nomad
-sudo systemctl start nomad

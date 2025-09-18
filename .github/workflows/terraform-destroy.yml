@@ -1,35 +1,57 @@
 name: "Terraform Destroy"
 on:
   workflow_dispatch:
+    inputs:
+      confirm-destroy:
+        description: 'Type "destroy" to confirm the destruction of resources'
+        required: true
+        default: ''
+
 permissions:
   id-token: write
   contents: read
+
 jobs:
   destroy:
     runs-on: ubuntu-latest
-    environment: production
+    environment: production  # Ensure environment has protection rules for manual approval
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
-      - name: Set up AWS Credentials
+
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
-  
-      - name: Setup Terraform
+      - name: Setup Terraform CLI
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
-        run: terraform init
         working-directory: terraform
+        run: |
+          terraform init -input=false -no-color \
+            -backend-config="bucket=${{ secrets.TF_VAR_S3_BUCKET_NAME }}" \
+            -backend-config="key=terraform.tfstate" \
+            -backend-config="region=ap-south-1" \
+            -backend-config="dynamodb_table=${{ secrets.TF_VAR_DYNAMODB_TABLE_NAME }}"
 
+      # Optional: Force unlock if you know state is locked intentionally (can be removed or commented)
+      #- name: Force Unlock Terraform State
+      #  working-directory: terraform
+      #  run: terraform force-unlock -force adb2ddee-77a8-5cc0-ba67-09a2e6eb563c
 
-      - name: Terraform Destroy
+      - name: Validate destroy confirmation input
+        if: ${{ github.event.inputs['confirm-destroy'] != 'destroy' }}
+        run: |
+          echo "Destroy confirmation input not matched or empty. Please type 'destroy' to proceed."
+          exit 1
+
+      - name: Terraform Plan Destroy
         working-directory: terraform
+        run: terraform plan -destroy -out=tfplan -input=false -no-color
         env:
           TF_VAR_region:               ${{ secrets.TF_VAR_REGION }}
           TF_VAR_availability_zone:    ${{ secrets.TF_VAR_AVAILABILITY_ZONE }}
@@ -42,6 +64,21 @@ jobs:
           TF_VAR_s3_bucket_name:           ${{ secrets.TF_VAR_S3_BUCKET_NAME }}
           TF_VAR_dynamodb_table_name:      ${{ secrets.TF_VAR_DYNAMODB_TABLE_NAME }}
           TF_VAR_nomad_client_count:        ${{ secrets.TF_VAR_NOMAD_CLIENT_COUNT }}
-          TF_VAR_bastion_public_key:         ${{ secrets.TF_VAR_BASTION_PUBLIC_KEY }}4
-        run: terraform destroy -auto-approve
+          TF_VAR_bastion_public_key:         ${{ secrets.TF_VAR_BASTION_PUBLIC_KEY }}
 
+      - name: Terraform Destroy Apply
+        working-directory: terraform
+        run: terraform apply -input=false -auto-approve tfplan
+        env:
+          TF_VAR_region:               ${{ secrets.TF_VAR_REGION }}
+          TF_VAR_availability_zone:    ${{ secrets.TF_VAR_AVAILABILITY_ZONE }}
+          TF_VAR_vpc_cidr:              ${{ secrets.TF_VAR_VPC_CIDR }}
+          TF_VAR_public_subnet_cidr:    ${{ secrets.TF_VAR_PUBLIC_SUBNET_CIDR }}
+          TF_VAR_private_subnet_cidr:   ${{ secrets.TF_VAR_PRIVATE_SUBNET_CIDR }}
+          TF_VAR_instance_type:         ${{ secrets.TF_VAR_INSTANCE_TYPE }}
+          TF_VAR_key_name:               ${{ secrets.TF_VAR_KEY_NAME }}
+          TF_VAR_admin_cidr:              ${{ secrets.TF_VAR_ADMIN_CIDR }}
+          TF_VAR_s3_bucket_name:           ${{ secrets.TF_VAR_S3_BUCKET_NAME }}
+          TF_VAR_dynamodb_table_name:      ${{ secrets.TF_VAR_DYNAMODB_TABLE_NAME }}
+          TF_VAR_nomad_client_count:        ${{ secrets.TF_VAR_NOMAD_CLIENT_COUNT }}
+          TF_VAR_bastion_public_key:         ${{ secrets.TF_VAR_BASTION_PUBLIC_KEY }}
