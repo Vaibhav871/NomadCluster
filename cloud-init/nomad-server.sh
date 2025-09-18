@@ -3,8 +3,7 @@ set -e
 
 echo "Configuring Nomad Server..."
 
-# Variables
-DATACENTER_NAME="dc1"              # Customize your datacenter name
+
 CLUSTER_SERVER_COUNT=3             # Should match your cluster size!
 SERVER_AWS_TAG_KEY="NomadServer"
 SERVER_AWS_TAG_VALUE="true"
@@ -23,7 +22,7 @@ sudo chmod 700 /opt/nomad
 INSTANCE_IP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
 
 sudo tee /etc/nomad.d/server.hcl > /dev/null <<EOF
-datacenter = "${DATACENTER_NAME}"
+datacenter = "dc1"
 data_dir = "/opt/nomad"
 bind_addr = "0.0.0.0"
 
