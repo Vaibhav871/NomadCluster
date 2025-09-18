@@ -7,7 +7,7 @@ resource "aws_instance" "nomad_server" {
   associate_public_ip_address = false
 
   user_data = templatefile("${path.module}/../cloud-init/nomad-server.sh", {
-    NOMAD_VERSION = "1.10.5"
+
   })
 
   tags = {

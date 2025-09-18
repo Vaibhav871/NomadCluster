@@ -9,7 +9,6 @@ resource "aws_instance" "nomad_client" {
 
   user_data = templatefile("${path.module}/../cloud-init/nomad-client.sh", {
     NOMAD_SERVER_IP = aws_instance.nomad_server.private_ip
-    NOMAD_VERSION   = "1.10.5"
   })
 
 
