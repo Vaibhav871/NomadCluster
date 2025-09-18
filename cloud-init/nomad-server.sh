@@ -14,11 +14,7 @@ sudo chmod 700 /etc/nomad.d
 sudo mkdir -p /opt/nomad
 sudo chmod 700 /opt/nomad
 
-# Optionally, create a dedicated system user for production
-# sudo useradd --system --home /opt/nomad --shell /bin/false nomad
-# sudo chown -R nomad:nomad /etc/nomad.d /opt/nomad
 
-# Get instance private IP for advertise block
 INSTANCE_IP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
 
 sudo tee /etc/nomad.d/server.hcl > /dev/null <<EOF
