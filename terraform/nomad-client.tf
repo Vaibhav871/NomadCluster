@@ -7,9 +7,7 @@ resource "aws_instance" "nomad_client" {
   vpc_security_group_ids      = [aws_security_group.nomad_sg.id]
   associate_public_ip_address = true
 
-  user_data = templatefile("${path.module}/../cloud-init/nomad-client.sh", {
-    NOMAD_SERVER_IP = aws_instance.nomad_server.private_ip
-  })
+  user_data = templatefile("${path.module}/../cloud-init/nomad-client.sh")
 
 
   depends_on = [aws_instance.nomad_server]
