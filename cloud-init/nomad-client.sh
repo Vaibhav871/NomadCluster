@@ -4,7 +4,7 @@ set -e
 echo "Configuring Nomad Client..."
 
 # Variables for AWS tag-based discovery and datacenter name
-SERVER_AWS_TAG_KEY="NomadServer"
+SERVER_AWS_TAG_KEY="nomad-server"
 SERVER_AWS_TAG_VALUE="true"
 
 
