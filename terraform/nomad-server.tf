@@ -1,5 +1,5 @@
 resource "aws_instance" "nomad_server" {
-  ami                         = data.aws_ami.ubuntu.id
+  ami                         = var.nomad_ami_id
   instance_type               = var.instance_type
   subnet_id                   = aws_subnet.private.id
   key_name                    = var.key_name

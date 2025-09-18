@@ -8,6 +8,7 @@ CLUSTER_SERVER_COUNT=1
 SERVER_AWS_TAG_KEY="nomad-server"
 SERVER_AWS_TAG_VALUE="true"
 
+# Create directories with locked-down permissions
 sudo mkdir -p /etc/nomad.d
 sudo chmod 700 /etc/nomad.d
 sudo mkdir -p /opt/nomad
@@ -37,7 +38,7 @@ server {
 }
 
 telemetry {
-  collection_interval         = "15s"S
+  collection_interval         = "15s"
   prometheus_metrics          = true
   publish_allocation_metrics  = true
   publish_node_metrics        = true
@@ -45,13 +46,9 @@ telemetry {
 }
 EOF
 
-# Secure config file permissions
-sudo chmod 600 /etc/nomad.d/server.hcl
+# Set proper ownership
+chown nomad:nomad /etc/nomad.d/server.hcl
 
-# Optionally, chown for system user
-sudo chown nomad:nomad /etc/nomad.d/server.hcl
-
-sudo systemctl daemon-reload
-sudo systemctl enable nomad
-sudo systemctl restart nomad
-
+# Restart Nomad service
+systemctl restart nomad
+systemctl enable nomad

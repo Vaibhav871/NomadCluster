@@ -1,6 +1,6 @@
 resource "aws_instance" "nomad_client" {
   count                       = var.nomad_client_count
-  ami                         = data.aws_ami.ubuntu.id
+  ami                         = var.nomad_ami_id
   instance_type               = var.instance_type
   subnet_id                   = aws_subnet.public.id
   key_name                    = var.key_name
