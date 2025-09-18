@@ -24,8 +24,8 @@ jobs:
       - name: Terraform Init
         working-directory: terraform
         run: terraform init -input=false -no-color
-
         working-directory: terraform
+        
       - name: Terraform Destroy
         working-directory: terraform
         env:
