@@ -18,6 +18,7 @@ job "nginx-web" {
     }
 
 
+
     network {
       port "http" {
         static = 8080
