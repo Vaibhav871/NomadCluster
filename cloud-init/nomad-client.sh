@@ -47,8 +47,9 @@ EOF
 sudo chmod 600 /etc/nomad.d/client.hcl
 
 # (Optional) Set owner to nomad if running agent as non-root.
-# sudo chown nomad:nomad /etc/nomad.d/client.hcl
+sudo chown nomad:nomad /etc/nomad.d/client.hcl
 
 # Restart and enable Nomad service
-sudo systemctl restart nomad
+sudo systemctl daemon-reload
 sudo systemctl enable nomad
+sudo systemctl restart nomad

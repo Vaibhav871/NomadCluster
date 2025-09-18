@@ -4,7 +4,7 @@ set -e
 echo "Configuring Nomad Server..."
 
 
-CLUSTER_SERVER_COUNT=3             # Should match your cluster size!
+CLUSTER_SERVER_COUNT=1             # Should match your cluster size!
 SERVER_AWS_TAG_KEY="NomadServer"
 SERVER_AWS_TAG_VALUE="true"
 
@@ -50,7 +50,9 @@ EOF
 sudo chmod 600 /etc/nomad.d/server.hcl
 
 # Optionally, chown for system user
-# sudo chown nomad:nomad /etc/nomad.d/server.hcl
+sudo chown nomad:nomad /etc/nomad.d/server.hcl
 
-sudo systemctl restart nomad
+sudo systemctl daemon-reload
 sudo systemctl enable nomad
+sudo systemctl restart nomad
+
