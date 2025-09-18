@@ -46,6 +46,9 @@ telemetry {
 }
 EOF
 
+sudo mkdir -p /opt/nomad
+sudo chown -R nomad:nomad /opt/nomad
+sudo chmod 700 /opt/nomad
 # Set proper ownership
 chown nomad:nomad /etc/nomad.d/server.hcl
 
