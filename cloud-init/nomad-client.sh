@@ -32,11 +32,6 @@ telemetry {
   publish_node_metrics        = true
   disable_hostname            = true
 }
-
-server_join {
-  retry_join     = ["provider=aws tag_key=${SERVER_AWS_TAG_KEY} tag_value=${SERVER_AWS_TAG_VALUE}"]
-  retry_interval = "15s"
-}
 EOF
 
 sudo mkdir -p /opt/nomad
