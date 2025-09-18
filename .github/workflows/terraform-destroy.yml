@@ -38,11 +38,6 @@ jobs:
             -backend-config="region=ap-south-1" \
             -backend-config="dynamodb_table=${{ secrets.TF_VAR_DYNAMODB_TABLE_NAME }}"
 
-      # Optional: Force unlock if you know state is locked intentionally (can be removed or commented)
-      #- name: Force Unlock Terraform State
-      #  working-directory: terraform
-      #  run: terraform force-unlock -force adb2ddee-77a8-5cc0-ba67-09a2e6eb563c
-
       - name: Validate destroy confirmation input
         if: ${{ github.event.inputs['confirm-destroy'] != 'destroy' }}
         run: |
