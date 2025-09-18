@@ -29,6 +29,12 @@ client {
   enabled = true
 }
 
+advertise {
+  http = "${INSTANCE_IP}"
+  rpc  = "${INSTANCE_IP}"
+  serf = "${INSTANCE_IP}"
+}
+
 telemetry {
   collection_interval         = "15s"
   prometheus_metrics          = true

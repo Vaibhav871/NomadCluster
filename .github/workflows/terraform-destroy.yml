@@ -23,9 +23,7 @@ jobs:
       - name: Terraform Init
         working-directory: terraform
         run: terraform init -input=false -no-color
-        
-      - name: Terraform Force Unlock
-        run: terraform force-unlock -force adb2ddee-77a8-5cc0-ba67-09a2e6eb563c
+
         working-directory: terraform
       - name: Terraform Destroy
         working-directory: terraform

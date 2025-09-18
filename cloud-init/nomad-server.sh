@@ -4,8 +4,8 @@ set -e
 echo "Configuring Nomad Server..."
 
 
-CLUSTER_SERVER_COUNT=1             # Should match your cluster size!
-SERVER_AWS_TAG_KEY="NomadServer"
+CLUSTER_SERVER_COUNT=1
+SERVER_AWS_TAG_KEY="nomad-server"
 SERVER_AWS_TAG_VALUE="true"
 
 # Create directories with locked-down permissions
