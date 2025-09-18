@@ -29,4 +29,3 @@ jobs:
         for job in nomad-job/*.nomad; do
           nomad job run "$job"
         done
-
