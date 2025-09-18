@@ -1,0 +1,31 @@
+name: Deploy Nomad Jobs
+
+on:
+  push:
+    paths:
+      - 'nomad-job/**'   
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Nomad CLI
+      run: |
+        NOMAD_VERSION=1.6.3
+        curl -s -L -o nomad.zip https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_linux_amd64.zip
+        unzip nomad.zip
+        sudo mv nomad /usr/local/bin/
+        nomad -v
+
+    - name: Deploy all Nomad jobs
+      env:
+        NOMAD_ADDR: ${{ secrets.NOMAD_ADDR }}
+        NOMAD_TOKEN: ${{ secrets.NOMAD_TOKEN }}
+      run: |
+        for job in nomad-job/*.hcl; do
+          nomad job run "$job"
+        done
