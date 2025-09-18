@@ -38,7 +38,7 @@ variable "nomad_client_count" {
   description = "Number of Nomad client instances to create"
   default     = 1
 }
-# s3 variables 
+
 
 variable "s3_bucket_name" {
   description = "Name of the S3 bucket to store Terraform state"
@@ -50,10 +50,10 @@ variable "dynamodb_table_name" {
   default     = "nomad-tf-lock"
 }
 
-# security group variable
+
 variable "admin_cidr" {
   description = "Your IP range to allow SSH to bastion (format: x.x.x.x/32)"
-  default     = "0.0.0.0/0" # replace with your real IP for security
+  default     = "0.0.0.0/0"
 }
 
 variable "bastion_public_key" {}
