@@ -7,7 +7,7 @@ echo "Configuring Nomad Client..."
 # SERVER_AWS_TAG_KEY="nomad-server"
 # SERVER_AWS_TAG_VALUE="true"
 
-NOMAD_SERVER_IP="${NOMAD_SERVER_IP}"
+# NOMAD_SERVER_IP="${NOMAD_SERVER_IP}"
 # INSTANCE_IP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
 
 
@@ -17,22 +17,25 @@ datacenter = "dc1"
 data_dir = "/opt/nomad"
 bind_addr = "0.0.0.0"
 
-
 client {
   enabled = true
-  servers = ["${NOMAD_SERVER_IP}"]
 }
 
-
+server_join {
+  retry_join = ["provider=aws tag_key=Name tag_value=nomad-server"]
+  retry_max = 5
+  retry_interval = "30s"
+}
 
 telemetry {
-  collection_interval         = "15s"
-  prometheus_metrics          = true
-  publish_allocation_metrics  = true
-  publish_node_metrics        = true
-  disable_hostname            = true
+  collection_interval          = "15s"
+  prometheus_metrics           = true
+  publish_allocation_metrics   = true
+  publish_node_metrics         = true
+  disable_hostname             = true
 }
 EOF
+
 
 sudo mkdir -p /opt/nomad
 sudo chown -R nomad:nomad /opt/nomad

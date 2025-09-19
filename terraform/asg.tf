@@ -1,44 +1,93 @@
-resource "aws_launch_template" "nomad_client" {
-  name          = "nomad-client"
-  image_id      = var.nomad_client_ami            # Your Packer-built Nomad AMI ID
-  instance_type = var.nomad_client_instance_type  # e.g., "t3.micro"
-  key_name      = var.key_name
+resource "aws_launch_configuration" "nomad_client_lc" {
+  name_prefix                 = "nomad-client-lc-"
+  image_id                    = var.nomad_ami_id
+  instance_type               = var.instance_type
+  key_name                    = var.key_name
+  security_groups             = [aws_security_group.nomad_sg.id]
+  associate_public_ip_address = true
+  iam_instance_profile        = aws_iam_instance_profile.nomad_client_profile.name
 
-  # Cloud-init or override config not needed if baked into AMI
-  iam_instance_profile = aws_iam_instance_profile.nomad_client_profile.id
-  security_group_names = [aws_security_group.nomad_client_sg.name]
+  user_data = file("${path.module}/../cloud-init/nomad-client.sh")
 
-  tag_specifications {
-    resource_type = "instance"
-    tags = {
-      Name        = "nomad-client"
-      NomadClient = "true"
-    }
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  root_block_device {
+    volume_size           = 20
+    volume_type           = "gp3"
+    delete_on_termination = true
   }
 }
 
-resource "aws_autoscaling_group" "nomad_clients" {
-  desired_capacity     = var.nomad_client_desired_count  # Set in tfvars
-  min_size             = 1
-  max_size             = 10
-  vpc_zone_identifier  = [aws_subnet.public.id]          # List of subnet IDs for ASG
-
-  launch_template {
-    id      = aws_launch_template.nomad_client.id
-    version = "$Latest"
-  }
+resource "aws_autoscaling_group" "nomad_client_asg" {
+  name                      = "nomad-client-asg"
+  max_size                  = 5
+  min_size                  = var.nomad_client_count
+  desired_capacity          = var.nomad_client_count
+  health_check_type         = "EC2"
+  health_check_grace_period = 120
+  vpc_zone_identifier       = [aws_subnet.public.id] # Ensure clients are in public subnet
+  launch_configuration      = aws_launch_configuration.nomad_client_lc.id
+  termination_policies      = ["OldestInstance", "Default"]
 
   tag {
     key                 = "Name"
     value               = "nomad-client"
     propagate_at_launch = true
   }
+
+  tag {
+    key                 = "Cluster"
+    value               = "nomad-cluster"
+    propagate_at_launch = true
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
-# Example variables (add to variables.tf)
-variable "nomad_client_ami" {}
-variable "nomad_client_instance_type" { default = "t3.micro" }
-variable "nomad_client_desired_count" { default = 2 }
-variable "key_name" {} # For SSH if required
+resource "aws_iam_role" "nomad_client_role" {
+  name = "nomad-client-role"
 
-# IAM Instance Profile, Security Group, and Subnet resources assumed configured elsewhere.
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "ec2.amazonaws.com"
+      }
+    }]
+  })
+}
+
+resource "aws_iam_policy" "nomad_client_policy" {
+  name        = "nomad-client-policy"
+  description = "IAM policy for Nomad client EC2 to describe instances for cluster discovery"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "ec2:DescribeInstances",
+          "ec2:DescribeTags"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "nomad_client_policy_attach" {
+  role       = aws_iam_role.nomad_client_role.name
+  policy_arn = aws_iam_policy.nomad_client_policy.arn
+}
+
+resource "aws_iam_instance_profile" "nomad_client_profile" {
+  name = "nomad-client-instance-profile"
+  role = aws_iam_role.nomad_client_role.name
+}

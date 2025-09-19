@@ -9,6 +9,8 @@ resource "aws_instance" "nomad_server" {
   user_data = file("${path.module}/../cloud-init/nomad-server.sh")
 
   tags = {
-    Name = "nomad-server"
+    Name    = "nomad-server"  # For server instances
+    Cluster = "nomad-cluster" # Common tag for all cluster nodes optionally
   }
+
 }
