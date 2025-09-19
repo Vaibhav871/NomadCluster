@@ -10,7 +10,7 @@ resource "aws_launch_template" "nomad_client_lt" {
     name = aws_iam_instance_profile.nomad_client_profile.name
   }
 
-  user_data = base64encode(file("${path.module}/nomad-client.sh"))
+  user_data = base64encode(file("${path.module}/../cloud-init/nomad-client.sh"))
 
   tag_specifications {
     resource_type = "instance"
