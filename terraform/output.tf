@@ -8,10 +8,10 @@ output "nomad_server_private_ip" {
   value       = aws_instance.nomad_server.private_ip
 }
 
-output "nomad_client_private_ips" {
-  description = "Private IPs of Nomad clients"
-  value       = [for inst in aws_instance.nomad_client : inst.private_ip]
-}
+# output "nomad_client_private_ips" {
+#   description = "Private IPs of Nomad clients"
+#   value       = [for inst in aws_instance.nomad_client : inst.private_ip]
+# }
 
 output "nomad_ui_port" {
   description = "Nomad UI port"
