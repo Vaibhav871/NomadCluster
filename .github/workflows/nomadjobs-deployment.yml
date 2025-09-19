@@ -35,8 +35,8 @@ jobs:
       env:
         NOMAD_ADDR: http://localhost:4646
       run: |
-        nomad job validate jobs/your-job.nomad
-        nomad job run jobs/your-job.nomad
+        nomad job validate nomad-job/hello.nomad
+        nomad job run nomad-job/hello.nomad
 
     - name: Kill SSH tunnel
       run: |
