@@ -18,7 +18,7 @@ sudo chown -R nomad:nomad /opt/alloc_mounts
 sudo chmod 700 /opt/alloc_mounts
 
 
-sudo tee /etc/nomad.d/client.hcl > /dev/null <<EOF
+sudo bash -c 'cat > /etc/nomad.d/client.hcl <<EOF
 datacenter = "dc1"
 data_dir = "/opt/nomad"
 bind_addr = "0.0.0.0"
@@ -40,7 +40,8 @@ telemetry {
   publish_node_metrics         = true
   disable_hostname             = true
 }
-EOF
+EOF'
+
 
 # Set proper ownership
 chown nomad:nomad /etc/nomad.d/client.hcl
