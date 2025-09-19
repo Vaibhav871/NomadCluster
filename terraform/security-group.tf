@@ -54,7 +54,7 @@ resource "aws_security_group" "nomad_sg" {
   description = "Allow Nomad internal cluster and SSH from bastion"
   vpc_id      = aws_vpc.main.id
 
-  # UI access from Bastion only (optionally, restrict further using a security group rule)
+  # UI access from Bastion only
   ingress {
     description     = "Nomad UI (4646) from Bastion host"
     from_port       = 4646
@@ -71,43 +71,31 @@ resource "aws_security_group" "nomad_sg" {
     cidr_blocks = ["0.0.0.0/0"] # Opens to the world. Restrict as necessary.
   }
 
-  # Nomad server RPC (4647, internal only)
+  # Nomad server RPC (4647, allow public-subnet clients)
   ingress {
-    description = "RPC (4647) within cluster"
+    description = "RPC (4647) from public-subnet Nomad clients"
     from_port   = 4647
     to_port     = 4647
     protocol    = "tcp"
-    self        = true
+    cidr_blocks = ["10.0.1.0/24"] # Replace with your client subnet CIDR
   }
 
+  # Serf LAN (4648 TCP) from public-subnet clients
   ingress {
-    from_port       = 4647
-    to_port         = 4647
-    protocol        = "tcp"
-    security_groups = [aws_security_group.nomad_client_sg.id]
-  }
-
-  ingress {
-    from_port       = 4648
-    to_port         = 4648
-    protocol        = "tcp"
-    security_groups = [aws_security_group.nomad_client_sg.id]
-  }
-
-  ingress {
-    from_port       = 4648
-    to_port         = 4648
-    protocol        = "udp"
-    security_groups = [aws_security_group.nomad_client_sg.id]
-  }
-
-  # Serf LAN (4648, internal gossip)
-  ingress {
-    description = "Serf LAN (4648) within cluster"
+    description = "Serf LAN TCP (4648) from public-subnet Nomad clients"
     from_port   = 4648
     to_port     = 4648
     protocol    = "tcp"
-    self        = true
+    cidr_blocks = ["10.0.1.0/24"] # Replace with your client subnet CIDR
+  }
+
+  # Serf LAN (4648 UDP) from public-subnet clients
+  ingress {
+    description = "Serf LAN UDP (4648) from public-subnet Nomad clients"
+    from_port   = 4648
+    to_port     = 4648
+    protocol    = "udp"
+    cidr_blocks = ["10.0.1.0/24"] # Replace with your client subnet CIDR
   }
 
   # Allow SSH from Bastion security group only
