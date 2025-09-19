@@ -1,25 +1,3 @@
-resource "aws_launch_configuration" "nomad_client_lc" {
-  name_prefix                 = "nomad-client-lc-"
-  image_id                    = var.nomad_ami_id
-  instance_type               = var.instance_type
-  key_name                    = var.key_name
-  security_groups             = [aws_security_group.nomad_sg.id]
-  associate_public_ip_address = true
-  iam_instance_profile        = aws_iam_instance_profile.nomad_client_profile.name
-
-  user_data = file("${path.module}/../cloud-init/nomad-client.sh")
-
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  root_block_device {
-    volume_size           = 20
-    volume_type           = "gp3"
-    delete_on_termination = true
-  }
-}
-
 resource "aws_autoscaling_group" "nomad_client_asg" {
   name                      = "nomad-client-asg"
   max_size                  = 5
@@ -27,9 +5,12 @@ resource "aws_autoscaling_group" "nomad_client_asg" {
   desired_capacity          = var.nomad_client_count
   health_check_type         = "EC2"
   health_check_grace_period = 120
-  vpc_zone_identifier       = [aws_subnet.public.id] # Ensure clients are in public subnet
-  launch_configuration      = aws_launch_configuration.nomad_client_lc.id
-  termination_policies      = ["OldestInstance", "Default"]
+  vpc_zone_identifier       = [aws_subnet.public.id]
+
+  launch_template {
+    id      = aws_launch_template.nomad_client_lt.id
+    version = "$Latest"
+  }
 
   tag {
     key                 = "Name"
@@ -47,6 +28,7 @@ resource "aws_autoscaling_group" "nomad_client_asg" {
     create_before_destroy = true
   }
 }
+
 
 resource "aws_iam_role" "nomad_client_role" {
   name = "nomad-client-role"
