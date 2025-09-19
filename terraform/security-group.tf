@@ -80,6 +80,27 @@ resource "aws_security_group" "nomad_sg" {
     self        = true
   }
 
+  ingress {
+    from_port       = 4647
+    to_port         = 4647
+    protocol        = "tcp"
+    security_groups = [aws_security_group.nomad_client_sg.id]
+  }
+
+  ingress {
+    from_port       = 4648
+    to_port         = 4648
+    protocol        = "tcp"
+    security_groups = [aws_security_group.nomad_client_sg.id]
+  }
+
+  ingress {
+    from_port       = 4648
+    to_port         = 4648
+    protocol        = "udp"
+    security_groups = [aws_security_group.nomad_client_sg.id]
+  }
+
   # Serf LAN (4648, internal gossip)
   ingress {
     description = "Serf LAN (4648) within cluster"
