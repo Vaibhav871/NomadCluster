@@ -22,6 +22,7 @@ job "nginx-web" {
         static = 8080
         to     = 80
       }
+      
     }
   }
 }
