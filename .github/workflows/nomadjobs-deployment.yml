@@ -1,0 +1,47 @@
+name: Deploy Nomad Job
+
+on:
+  push:
+    paths:
+      - 'nomad-job/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+
+    - name: Install Nomad CLI
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y unzip
+        curl -fsSL https://releases.hashicorp.com/nomad/1.5.7/nomad_1.5.7_linux_amd64.zip -o nomad.zip
+        unzip nomad.zip
+        sudo mv nomad /usr/local/bin/
+        nomad version
+
+    - name: Setup SSH Agent
+      uses: webfactory/ssh-agent@v0.5.4
+      with:
+        ssh-private-key: ${{ secrets.BASTION_SSH_KEY }}
+
+    - name: Create SSH tunnel to Nomad server via Bastion
+      run: |
+        nohup ssh -o StrictHostKeyChecking=no -N -L 4646:${{ secrets.NOMAD_IP }}:4646 ubuntu@${{ secrets.BASTION_IP }} > ssh_tunnel.log 2>&1 &
+        sleep 5
+        for i in {1..10}; do nc -z localhost 4646 && break || sleep 2; done
+      shell: bash
+
+    - name: Deploy Nomad Job
+      env:
+        NOMAD_ADDR: http://127.0.0.1:4646
+      run: |
+        sudo nomad job validate nomad-job/hello.nomad
+        sudo nomad job run nomad-job/hello.nomad
+
+    - name: Kill SSH Tunnel
+      if: always()
+      run: |
+        pkill -f "ssh -N -L 4646:${{ secrets.NOMAD_IP }}:4646"
