@@ -38,8 +38,8 @@ jobs:
       env:
         NOMAD_ADDR: http://127.0.0.1:4646
       run: |
-        nomad job validate nomad-job/hello.nomad
-        nomad job run nomad-job/hello.nomad
+        sudo nomad job validate nomad-job/hello.nomad
+        sudo nomad job run nomad-job/hello.nomad
 
     - name: Kill SSH Tunnel
       if: always()
