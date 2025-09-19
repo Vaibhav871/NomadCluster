@@ -1,31 +1,43 @@
-name: Deploy Nomad Jobs
+name: Deploy Nomad Job
 
 on:
   push:
     paths:
-      - 'nomad-job/**'   
+      - 'nomad-job/**'  
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+    - name: Checkout Repository
+      uses: actions/checkout@v3
 
-    - name: Set up Nomad CLI
+    - name: Install Nomad CLI
       run: |
-        NOMAD_VERSION=1.6.3
-        curl -s -L -o nomad.zip https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_linux_amd64.zip
+        curl -fsSL https://releases.hashicorp.com/nomad/1.5.7/nomad_1.5.7_linux_amd64.zip -o nomad.zip
         unzip nomad.zip
         sudo mv nomad /usr/local/bin/
-        nomad -v
+        nomad version
 
-    - name: Deploy all Nomad jobs
-      env:
-        NOMAD_ADDR: ${{ secrets.NOMAD_ADDR }}
-        NOMAD_TOKEN: ${{ secrets.NOMAD_TOKEN }}
+    - name: Setup SSH
+      uses: webfactory/ssh-agent@v0.5.4
+      with:
+        ssh-private-key: ${{ secrets.BASTION_SSH_KEY }}
+
+    - name: Create SSH tunnel to Nomad server via Bastion
       run: |
-        for job in nomad-job/*.nomad; do
-          nomad job run "$job"
-        done
+        nohup ssh -o StrictHostKeyChecking=no -N -L 4646:${{ secrets.NOMAD_PRIVATE_IP }}:4646 ec2-user@${{ secrets.BASTION_PUBLIC_IP }} &
+        sleep 5
+      shell: bash
+
+    - name: Deploy Nomad Job
+      env:
+        NOMAD_ADDR: http://localhost:4646
+      run: |
+        nomad job validate jobs/your-job.nomad
+        nomad job run jobs/your-job.nomad
+
+    - name: Kill SSH tunnel
+      run: |
+        pkill -f "ssh -N -L 4646:${{ secrets.NOMAD_PRIVATE_IP }}:4646"

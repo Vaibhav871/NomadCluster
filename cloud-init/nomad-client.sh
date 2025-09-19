@@ -13,6 +13,10 @@ sudo mkdir -p /opt/nomad
 sudo chown -R nomad:nomad /opt/nomad
 sudo chmod 700 /opt/nomad
 
+sudo mkdir -p /opt/alloc_mounts
+sudo chown -R nomad:nomad /opt/alloc_mounts
+sudo chmod 700 /opt/alloc_mounts
+
 
 sudo tee /etc/nomad.d/client.hcl > /dev/null <<EOF
 datacenter = "dc1"
@@ -41,6 +45,10 @@ EOF
 # Set proper ownership
 chown nomad:nomad /etc/nomad.d/client.hcl
 
-systemctl daemon-reload
-systemctl restart nomad
-systemctl enable nomad
+sudo usermod -aG docker $USER
+newgrp docker
+
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+sudo systemctl restart nomad
+sudo systemctl enable nomad
