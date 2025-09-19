@@ -9,7 +9,9 @@ echo "Configuring Nomad Client..."
 
 # NOMAD_SERVER_IP="${NOMAD_SERVER_IP}"
 # INSTANCE_IP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
-
+sudo mkdir -p /opt/nomad
+sudo chown -R nomad:nomad /opt/nomad
+sudo chmod 700 /opt/nomad
 
 
 sudo tee /etc/nomad.d/client.hcl > /dev/null <<EOF
@@ -36,13 +38,9 @@ telemetry {
 }
 EOF
 
-
-sudo mkdir -p /opt/nomad
-sudo chown -R nomad:nomad /opt/nomad
-sudo chmod 700 /opt/nomad
-
-
 # Set proper ownership
 chown nomad:nomad /etc/nomad.d/client.hcl
+
+systemctl daemon-reload
 systemctl restart nomad
 systemctl enable nomad
