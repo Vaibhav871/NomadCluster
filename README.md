@@ -131,6 +131,8 @@ Applications deployed through Nomad are accessible via the client nodes:
 - **Scoped IAM roles** for deployment automation
 - **Terraform state** stored securely (remote backend recommended)
 
+### ASG Configuration Highlights
+- **Desired Count**: Defined as `TF_VAR_NOMAD_CLIENT_COUNT` to control initial and target client node count.
 ---
 
 ## 🏗️ Custom AMI with Packer
