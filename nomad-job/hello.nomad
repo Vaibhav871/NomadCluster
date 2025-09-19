@@ -16,12 +16,13 @@ job "nginx-web" {
         memory = 128
       }
     }
-    
+
     network {
       port "http" {
         static = 8080
         to     = 80
       }
     }
+    
   }
 }

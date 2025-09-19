@@ -34,13 +34,6 @@ server {
 
 }
 
-acl {
-  enabled = true
-  token_ttl = "30m"
-  policy_ttl = "30m"
-  replication_token = ""
-}
-
 telemetry {
   collection_interval         = "15s"
   prometheus_metrics          = true

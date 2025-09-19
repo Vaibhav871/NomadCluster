@@ -45,7 +45,7 @@ EOF
 # Set proper ownership
 chown nomad:nomad /etc/nomad.d/client.hcl
 
-sudo usermod -aG docker $USER
+sudo usermod -aG docker nomad
 newgrp docker
 
 sudo systemctl daemon-reload
