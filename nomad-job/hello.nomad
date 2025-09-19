@@ -23,6 +23,6 @@ job "nginx-web" {
         to     = 80
       }
     }
-    
+
   }
 }
