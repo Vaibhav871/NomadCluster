@@ -64,7 +64,6 @@ resource "aws_iam_policy" "nomad_client_policy" {
   })
 }
 
-
 resource "aws_iam_role_policy_attachment" "nomad_client_policy_attach" {
   role       = aws_iam_role.nomad_client_role.name
   policy_arn = aws_iam_policy.nomad_client_policy.arn
