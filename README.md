@@ -73,15 +73,13 @@ Then open: **http://localhost:4646** in your browser
 
 1. **Prometheus access**
    ```bash
-   ssh -i ./NomadCluster/.ssh/bastionkey -L 9090:10.0.2.249:9090 ubuntu@<BASTION_IP>
+   http://<bastion-public-ip>:9090
    ```
-   Access: **http://<bastion-public-ip>:9090**
 
 2. **Grafana dashboard access**
    ```bash
-   ssh -i ./NomadCluster/.ssh/bastionkey -L 3000:10.0.2.249:3000 ubuntu@<BASTION_IP>
+   http://<bastion-public-ip>:3000
    ```
-   Access: **http://<bastion-public-ip>:3000**
 
 ---
 
@@ -171,8 +169,6 @@ BASTION_IP               # Public IP of Bastion host
 - **Automated Terraform deployment** on pull request merge
 - **Infrastructure validation** and security scanning
 
-
-
 ---
 
 ## 📊 Monitoring & Observability
@@ -202,18 +198,5 @@ terraform destroy
 - [HashiCorp Nomad Documentation](https://developer.hashicorp.com/nomad)
 - [Terraform AWS Provider](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)
 - [Packer Documentation](https://developer.hashicorp.com/packer)
-- [Project Repository](https://github.com/Vaibhav871/Nomad-cluster-infrastructure-Project)
 
----
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
----
-
-**Note**: This setup uses a single Nomad server for demonstration. For production environments, deploy a **3+ server cluster** for high availability and fault tolerance.
