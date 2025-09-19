@@ -27,8 +27,13 @@ jobs:
 
     - name: Create SSH tunnel to Nomad server via Bastion
       run: |
-        nohup ssh -o StrictHostKeyChecking=no -N -L 4646:${{ secrets.NOMAD_PRIVATE_IP }}:4646 ec2-user@${{ secrets.BASTION_PUBLIC_IP }} &
-        sleep 5
+        # Start SSH tunnel in background, output logs for debug
+        nohup ssh -o StrictHostKeyChecking=no -N -L 4646:${{ secrets.NOMAD_PRIVATE_IP }}:4646 ec2-user@${{ secrets.BASTION_PUBLIC_IP }} > ssh_tunnel.log 2>&1 &
+        sleep 10
+        # Check if tunnel is running
+        ps aux | grep "ssh -N -L 4646"
+        # Optional: Display last 10 lines of tunnel logs
+        tail -n 10 ssh_tunnel.log
       shell: bash
 
     - name: Deploy Nomad Job
