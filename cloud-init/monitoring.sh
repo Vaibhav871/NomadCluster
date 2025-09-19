@@ -74,7 +74,6 @@ sudo apt-get install -y grafana
 sudo systemctl enable --now grafana-server
 
 
-# Finished
 
 echo "Prometheus and Grafana installed successfully."
 echo "Prometheus: http://<BASTION_PUBLIC_IP>:9090"

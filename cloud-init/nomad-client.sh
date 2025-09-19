@@ -2,8 +2,7 @@
 set -e
 echo "Configuring Nomad Client..."
 
-# Ensure running as root in User Data
-# Directories for Nomad
+
 mkdir -p /opt/nomad
 mkdir -p /opt/nomad/plugins
 chown -R nomad:nomad /opt/nomad
@@ -45,7 +44,7 @@ chmod 640 /etc/nomad.d/client.hcl
 # Docker permissions
 usermod -aG docker nomad
 
-# Delay to allow docker service to start in User Data
+
 systemctl daemon-reload
 systemctl enable docker
 systemctl start docker

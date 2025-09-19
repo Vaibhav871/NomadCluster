@@ -1,6 +1,6 @@
-# -------------------------
+
 # Bastion Security Group
-# -------------------------
+
 resource "aws_security_group" "bastion_sg" {
   name        = "bastion-sg"
   description = "Allow SSH, Prometheus, Grafana from admin workstation"
@@ -12,7 +12,7 @@ resource "aws_security_group" "bastion_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [var.admin_cidr] # Only your public IP
+    cidr_blocks = [var.admin_cidr]
   }
 
   # Prometheus UI
@@ -46,9 +46,9 @@ resource "aws_security_group" "bastion_sg" {
   }
 }
 
-# -------------------------
+
 # Nomad Cluster Security Group
-# -------------------------
+
 resource "aws_security_group" "nomad_sg" {
   name        = "nomad-cluster-sg"
   description = "Allow Nomad internal cluster and SSH from bastion"
@@ -60,7 +60,7 @@ resource "aws_security_group" "nomad_sg" {
     from_port       = 4646
     to_port         = 4646
     protocol        = "tcp"
-    security_groups = [aws_security_group.bastion_sg.id] # Allow from Bastion SG only
+    security_groups = [aws_security_group.bastion_sg.id]
   }
 
   ingress {
@@ -68,7 +68,7 @@ resource "aws_security_group" "nomad_sg" {
     from_port   = 8080
     to_port     = 8080
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # Opens to the world. Restrict as necessary.
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   # Nomad server RPC (4647, allow public-subnet clients)
@@ -77,7 +77,7 @@ resource "aws_security_group" "nomad_sg" {
     from_port   = 4647
     to_port     = 4647
     protocol    = "tcp"
-    cidr_blocks = ["10.0.1.0/24"] # Replace with your client subnet CIDR
+    cidr_blocks = ["10.0.1.0/24"]
   }
 
   # Serf LAN (4648 TCP) from public-subnet clients
@@ -86,7 +86,7 @@ resource "aws_security_group" "nomad_sg" {
     from_port   = 4648
     to_port     = 4648
     protocol    = "tcp"
-    cidr_blocks = ["10.0.1.0/24"] # Replace with your client subnet CIDR
+    cidr_blocks = ["10.0.1.0/24"]
   }
 
   # Serf LAN (4648 UDP) from public-subnet clients
@@ -95,7 +95,7 @@ resource "aws_security_group" "nomad_sg" {
     from_port   = 4648
     to_port     = 4648
     protocol    = "udp"
-    cidr_blocks = ["10.0.1.0/24"] # Replace with your client subnet CIDR
+    cidr_blocks = ["10.0.1.0/24"]
   }
 
   # Allow SSH from Bastion security group only
@@ -107,7 +107,7 @@ resource "aws_security_group" "nomad_sg" {
     security_groups = [aws_security_group.bastion_sg.id]
   }
 
-  # Egress: Allow all traffic to outside (limit as needed)
+
   egress {
     from_port   = 0
     to_port     = 0
