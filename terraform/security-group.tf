@@ -1,12 +1,8 @@
-# -------------------------
-# Bastion Security Group
-# -------------------------
 resource "aws_security_group" "bastion_sg" {
   name        = "bastion-sg"
   description = "Allow SSH, Prometheus, Grafana from admin workstation"
   vpc_id      = aws_vpc.main.id
 
-  # SSH from admin workstation
   ingress {
     description = "Allow SSH from admin workstation"
     from_port   = 22
@@ -15,7 +11,6 @@ resource "aws_security_group" "bastion_sg" {
     cidr_blocks = [var.admin_cidr] # Only your public IP
   }
 
-  # Prometheus UI
   ingress {
     description = "Allow Prometheus from admin workstation"
     from_port   = 9090
@@ -24,7 +19,6 @@ resource "aws_security_group" "bastion_sg" {
     cidr_blocks = [var.admin_cidr]
   }
 
-  # Grafana UI
   ingress {
     description = "Allow Grafana from admin workstation"
     from_port   = 3000
@@ -33,7 +27,6 @@ resource "aws_security_group" "bastion_sg" {
     cidr_blocks = [var.admin_cidr]
   }
 
-  # Allow outgoing traffic
   egress {
     from_port   = 0
     to_port     = 0
@@ -46,59 +39,90 @@ resource "aws_security_group" "bastion_sg" {
   }
 }
 
-# -------------------------
-# Nomad Cluster Security Group
-# -------------------------
-resource "aws_security_group" "nomad_sg" {
-  name        = "nomad-cluster-sg"
-  description = "Allow Nomad internal cluster and SSH from bastion"
+resource "aws_security_group" "nomad_client_sg" {
+  name        = "nomad-client-sg"
+  description = "Allow outbound Nomad ports to server SG and SSH from bastion"
   vpc_id      = aws_vpc.main.id
 
-  # UI access from Bastion only
+  ingress {
+    description     = "Allow SSH from bastion"
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    security_groups = [aws_security_group.bastion_sg.id]
+  }
+
+  egress {
+    description     = "Allow Nomad communication to Nomad server SG"
+    from_port       = 4646
+    to_port         = 4648
+    protocol        = "tcp"
+    security_groups = [aws_security_group.nomad_server_sg.id]
+  }
+
+  egress {
+    from_port       = 4648
+    to_port         = 4648
+    protocol        = "udp"
+    security_groups = [aws_security_group.nomad_server_sg.id]
+  }
+
+  egress {
+    from_port       = 4647
+    to_port         = 4647
+    protocol        = "tcp"
+    security_groups = [aws_security_group.nomad_server_sg.id]
+  }
+
+  egress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # For public apps access
+  }
+
+  tags = {
+    Name = "nomad-client-sg"
+  }
+}
+
+resource "aws_security_group" "nomad_server_sg" {
+  name        = "nomad-server-sg"
+  description = "Allow Nomad internal cluster traffic and SSH from bastion and Nomad clients"
+  vpc_id      = aws_vpc.main.id
+
   ingress {
     description     = "Nomad UI (4646) from Bastion host"
     from_port       = 4646
     to_port         = 4646
     protocol        = "tcp"
-    security_groups = [aws_security_group.bastion_sg.id] # Allow from Bastion SG only
+    security_groups = [aws_security_group.bastion_sg.id]
   }
 
   ingress {
-    description = "Public access to apps on port 8080"
-    from_port   = 8080
-    to_port     = 8080
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # Opens to the world. Restrict as necessary.
+    description     = "Nomad cluster RPC (4647) from Nomad clients"
+    from_port       = 4647
+    to_port         = 4647
+    protocol        = "tcp"
+    security_groups = [aws_security_group.nomad_client_sg.id]
   }
 
-  # Nomad server RPC (4647, allow public-subnet clients)
   ingress {
-    description = "RPC (4647) from public-subnet Nomad clients"
-    from_port   = 4647
-    to_port     = 4647
-    protocol    = "tcp"
-    cidr_blocks = ["10.0.1.0/24"] # Replace with your client subnet CIDR
+    description     = "Serf LAN TCP (4648) from Nomad clients"
+    from_port       = 4648
+    to_port         = 4648
+    protocol        = "tcp"
+    security_groups = [aws_security_group.nomad_client_sg.id]
   }
 
-  # Serf LAN (4648 TCP) from public-subnet clients
   ingress {
-    description = "Serf LAN TCP (4648) from public-subnet Nomad clients"
-    from_port   = 4648
-    to_port     = 4648
-    protocol    = "tcp"
-    cidr_blocks = ["10.0.1.0/24"] # Replace with your client subnet CIDR
+    description     = "Serf LAN UDP (4648) from Nomad clients"
+    from_port       = 4648
+    to_port         = 4648
+    protocol        = "udp"
+    security_groups = [aws_security_group.nomad_client_sg.id]
   }
 
-  # Serf LAN (4648 UDP) from public-subnet clients
-  ingress {
-    description = "Serf LAN UDP (4648) from public-subnet Nomad clients"
-    from_port   = 4648
-    to_port     = 4648
-    protocol    = "udp"
-    cidr_blocks = ["10.0.1.0/24"] # Replace with your client subnet CIDR
-  }
-
-  # Allow SSH from Bastion security group only
   ingress {
     description     = "Allow SSH from Bastion"
     from_port       = 22
@@ -107,7 +131,6 @@ resource "aws_security_group" "nomad_sg" {
     security_groups = [aws_security_group.bastion_sg.id]
   }
 
-  # Egress: Allow all traffic to outside (limit as needed)
   egress {
     from_port   = 0
     to_port     = 0
@@ -116,6 +139,6 @@ resource "aws_security_group" "nomad_sg" {
   }
 
   tags = {
-    Name = "nomad-cluster-sg"
+    Name = "nomad-server-sg"
   }
 }
