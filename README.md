@@ -114,7 +114,7 @@ Applications deployed through Nomad are accessible via the client nodes:
 - **Private subnets** for all Nomad nodes (no direct internet access)
 - **Bastion host** as single point of entry with restricted security groups
 - **Security group rules** following principle of least privilege
-- **No public IPs** on Nomad server/client instances
+- **No public IPs** on Nomad server instances
 
 ### Access Control
 - **SSH key-based authentication** only (no password authentication)
@@ -158,11 +158,43 @@ packer build nomad-server.pkr.hcl -var-file=/.variables.pkr.hcl
 Required secrets for automated deployment:
 
 ```
-AWS_ACCESS_KEY_ID          # AWS access credentials
-AWS_SECRET_ACCESS_KEY      # AWS secret credentials  
-SSH_PRIVATE_KEY           # Private key for instance access
-NOMAD_SERVER_IP           # Private IP of Nomad server
-BASTION_IP               # Public IP of Bastion host
+## 🔑 GitHub Secrets and Terraform Variables
+
+### AWS and Region Settings
+- `AWS_ACCESS_KEY_ID`  
+- `AWS_SECRET_ACCESS_KEY`  
+- `AWS_REGION`  
+
+### AMI and Instance Configuration
+- `BASE_AMI`  
+- `INSTANCE_TYPE`  
+- `ROOT_VOLUME_SIZE`    
+
+### Nomad and Application Settings
+- `NOMAD_DOWNLOAD_URL`  
+- `NOMAD_VERSION`  
+
+### SSH and Access Management
+- `SSH_USERNAME`  
+
+### Availability and Region Zones
+- `TF_VAR_REGION`  
+- `TF_VAR_AVAILABILITY_ZONE`  
+
+### Terraform Variables
+- `TF_VAR_S3_BUCKET_NAME`  
+- `TF_VAR_VPC_CIDR`  
+- `TF_VAR_BASTION_PUBLIC_KEY`  
+- `TF_VAR_KEY_NAME`  
+- `TF_VAR_NOMAD_AMI_ID`  
+- `TF_VAR_NOMAD_CLIENT_COUNT`  
+- `TF_VAR_PRIVATE_SUBNET_CIDR`  
+- `TF_VAR_PUBLIC_SUBNET_CIDR`  
+- `TF_VAR_REGION`  
+- `TF_VAR_INSTANCE_TYPE`  
+- `TF_VAR_ADMIN_CIDR`  
+---
+
 ```
 
 ### Pipeline Features
