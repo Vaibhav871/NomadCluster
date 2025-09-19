@@ -231,4 +231,6 @@ terraform destroy
 - [Terraform AWS Provider](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)
 - [Packer Documentation](https://developer.hashicorp.com/packer)
 
+![grafana dashboard](images/grafana.png)
+![Nomad UI ](images/nomad-ui.png)
 
