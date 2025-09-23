@@ -30,8 +30,8 @@ resource "aws_autoscaling_group" "nomad_client_asg" {
 }
 
 
-resource "aws_iam_role" "nomad_client_role" {
-  name = "nomad-client-role"
+resource "aws_iam_role" "nomad_client_test_role" {
+  name = "nomad-client-test-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -65,11 +65,11 @@ resource "aws_iam_policy" "nomad_client_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "nomad_client_policy_attach" {
-  role       = aws_iam_role.nomad_client_role.name
+  role       = aws_iam_role.nomad_client_test_role.name
   policy_arn = aws_iam_policy.nomad_client_policy.arn
 }
 
 resource "aws_iam_instance_profile" "nomad_client_profile" {
   name = "nomad-client-instance-profile"
-  role = aws_iam_role.nomad_client_role.name
+  role = aws_iam_role.nomad_client_test_role.name
 }
