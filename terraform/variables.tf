@@ -1,10 +1,10 @@
 variable "region" {
-  default = "ap-south-1"
+  default = "us-east-1"
 }
 
 
 variable "availability_zone" {
-  default = "ap-south-1a"
+  default = "us-east-1a"
 }
 
 
@@ -42,7 +42,7 @@ variable "nomad_client_count" {
 
 variable "s3_bucket_name" {
   description = "Name of the S3 bucket to store Terraform state"
-  default     = "nomad-tfstate-mumbai"
+  default     = "nomad-tfstate-us"
 }
 
 variable "dynamodb_table_name" {
