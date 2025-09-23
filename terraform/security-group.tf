@@ -60,7 +60,7 @@ resource "aws_security_group" "nomad_sg" {
     from_port       = 4646
     to_port         = 4646
     protocol        = "tcp"
-    security_groups = ["10.0.1.0/24"]
+    security_groups = ["aws_security_group.bastion_sg.id"]
   }
 
   ingress {
@@ -89,14 +89,14 @@ resource "aws_security_group" "nomad_sg" {
     cidr_blocks = ["10.0.1.0/24"]
   }
 
-  # Serf LAN (4648 UDP) from public-subnet clients
-  ingress {
-    description = "Serf LAN UDP (4648) from public-subnet Nomad clients"
-    from_port   = 4648
-    to_port     = 4648
-    protocol    = "udp"
-    cidr_blocks = ["10.0.1.0/24"]
-  }
+  # # Serf LAN (4648 UDP) from public-subnet clients
+  # ingress {
+  #   description = "Serf LAN UDP (4648) from public-subnet Nomad clients"
+  #   from_port   = 4648
+  #   to_port     = 4648
+  #   protocol    = "udp"
+  #   cidr_blocks = ["10.0.1.0/24"]
+  # }
 
   # Allow SSH from Bastion security group only
   ingress {
