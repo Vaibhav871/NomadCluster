@@ -70,6 +70,6 @@ resource "aws_iam_role_policy_attachment" "nomad_client_test_policy_attach" {
 }
 
 resource "aws_iam_instance_profile" "nomad_client_test_profile" {
-  name = "nomad-client-instance-profile"
+  name = "nomad-client-instance-test-profile"
   role = aws_iam_role.nomad_client_test_role.name
 }
