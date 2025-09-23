@@ -13,4 +13,3 @@ output "nomad_ui_port" {
   description = "Nomad UI port"
   value       = 4646
 }
-
