@@ -12,6 +12,7 @@ resource "aws_autoscaling_group" "nomad_client_asg" {
     version = "$Latest"
   }
 
+
   tag {
     key                 = "Name"
     value               = "nomad-client"

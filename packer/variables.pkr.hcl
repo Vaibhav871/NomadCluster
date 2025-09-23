@@ -1,4 +1,4 @@
-aws_region      = "ap-south-1"
+aws_region      = "us-east-1"
 base_ami        = "ami-02d26659fd82cf299"
 instance_type   = "t3.micro"
 ssh_username    = "ubuntu"
