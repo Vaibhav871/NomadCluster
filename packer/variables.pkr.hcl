@@ -1,5 +1,5 @@
 aws_region      = "us-east-1"
-base_ami        = "ami-02d26659fd82cf299"
+base_ami        = "ami-0360c520857e3138f"
 instance_type   = "t3.micro"
 ssh_username    = "ubuntu"
 root_volume_size = 20
