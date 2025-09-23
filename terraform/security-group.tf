@@ -60,7 +60,7 @@ resource "aws_security_group" "nomad_sg" {
     from_port       = 4646
     to_port         = 4646
     protocol        = "tcp"
-    security_groups = [aws_security_group.bastion_sg.id]
+    security_groups = ["10.0.1.0/24"]
   }
 
   ingress {
