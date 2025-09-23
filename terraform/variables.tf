@@ -62,5 +62,5 @@ variable "bastion_public_key" {}
 variable "nomad_ami_id" {
   description = "Custom Nomad AMI ID created via Packer"
   type        = string
-  default     = "ami-06231fc76060ea293"
+  default     = "ami-01a46cec55324b191"
 }
