@@ -7,7 +7,7 @@ resource "aws_launch_template" "nomad_client_lt" {
   vpc_security_group_ids = [aws_security_group.nomad_sg.id]
 
   iam_instance_profile {
-    name = aws_iam_instance_profile.nomad_client_profile.name
+    name = aws_iam_instance_profile.nomad_client_test_profile.name
   }
 
   user_data = base64encode(file("${path.module}/../cloud-init/nomad-client.sh"))

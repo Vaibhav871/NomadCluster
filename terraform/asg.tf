@@ -45,8 +45,8 @@ resource "aws_iam_role" "nomad_client_test_role" {
   })
 }
 
-resource "aws_iam_policy" "nomad_client_policy" {
-  name        = "nomad-client-policy"
+resource "aws_iam_policy" "nomad_client_test_policy" {
+  name        = "nomad-client-test-policy"
   description = "IAM policy for Nomad client EC2 to describe instances for cluster discovery"
 
   policy = jsonencode({
@@ -64,12 +64,12 @@ resource "aws_iam_policy" "nomad_client_policy" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "nomad_client_policy_attach" {
+resource "aws_iam_role_policy_attachment" "nomad_client_test_policy_attach" {
   role       = aws_iam_role.nomad_client_test_role.name
-  policy_arn = aws_iam_policy.nomad_client_policy.arn
+  policy_arn = aws_iam_policy.nomad_client_test_policy.arn
 }
 
-resource "aws_iam_instance_profile" "nomad_client_profile" {
+resource "aws_iam_instance_profile" "nomad_client_test_profile" {
   name = "nomad-client-instance-profile"
   role = aws_iam_role.nomad_client_test_role.name
 }
